@@ -18,31 +18,28 @@ public class Application {
      */
     private void displayMenu() {
         System.out.println("Supported requests:\n" +
-                "- enter a natural number to know its properties; \n" +
+                "- enter a natural number to know its properties;\n" +
                 "- enter two natural numbers to obtain the properties of the list:\n" +
                 "  * the first parameter represents a starting number;\n" +
                 "  * the second parameter shows how many consecutive numbers are to be printed;\n" +
-                "- two natural numbers and a property to search for;\n" +
-                "- two natural numbers and two properties to search for;\n" +
+                "- two natural numbers and properties to search for;\n" +
                 "- separate the parameters with one space;\n" +
                 "- enter 0 to exit.");
-
 
         while (true) {
             System.out.println("Enter a request:");
             try {
                 String[] input = scanner.nextLine().split("\\s+");
+                int howMany = 0;
                 long number = Long.parseLong(input[0]);
-                int consecutive = 1;
-                List<Long> listOfNumbers = new ArrayList<>();
                 String firstRequest = null;
                 String secondRequest = null;
 
                 if (input.length > 1) {
-                    consecutive = Integer.parseInt(input[1]);
+                    howMany = Integer.parseInt(input[1]);
                 }
 
-                Validator.isNumberCorrect(number, consecutive);
+                Validator.isNumberCorrect(number, howMany);
 
                 if (number == 0) {
                     System.out.println("Goodbye!");
@@ -62,14 +59,7 @@ public class Application {
                     Validator.validateMutuallyRequests(firstRequest, secondRequest);
                 }
 
-
-
-                for (int i = 0; i < consecutive; i++) {
-                    listOfNumbers.add(number);
-                    number++;
-                }
-                displayInfoNumbers(listOfNumbers, consecutive, firstRequest, secondRequest);
-
+                displayInfoNumbers(number, howMany, firstRequest, secondRequest);
 
             } catch (InputMismatchException | WrongRequestException e) {
                 System.out.println(e.getMessage());
@@ -78,17 +68,15 @@ public class Application {
         }
     }
 
-    private void displayInfoNumbers(List<Long> listOfNumbers, int howMuch, String firstRequest, String secondRequest) {
-        long number = listOfNumbers.get(0);
-
+    private void displayInfoNumbers(long number, int howMany, String firstRequest, String secondRequest) {
         if (Objects.nonNull(secondRequest)) {
-            NumbersProperities.displayByRequest(getPredicate(firstRequest), getPredicate(secondRequest), number, howMuch);
+            NumbersProperities.displayByRequest(getPredicate(firstRequest), getPredicate(secondRequest), number, howMany);
         } else if (Objects.nonNull(firstRequest)) {
-            NumbersProperities.displayByRequest(getPredicate(firstRequest), number, howMuch);
-        } else if (howMuch > 1){
-            NumbersProperities.displayInfoAboutListOfNumbers(listOfNumbers);
-        } else if (howMuch == 1) {
-            NumbersProperities.displayInfoAboutOneNumber(listOfNumbers.get(0));
+            NumbersProperities.displayByRequest(getPredicate(firstRequest), number, howMany);
+        } else if (howMany > 0){
+            NumbersProperities.displayInfoAboutListOfNumbers(number, howMany);
+        } else if (howMany == 0) {
+            NumbersProperities.displayInfoAboutOneNumber(number);
         }
     }
 
@@ -112,6 +100,8 @@ public class Application {
                 return NumbersProperities.checkIsSquare;
             case "sunny":
                 return NumbersProperities.checkIsSunny;
+            case "jumping":
+                return NumbersProperities.checkIsJumping;
         }
         return null;
     }

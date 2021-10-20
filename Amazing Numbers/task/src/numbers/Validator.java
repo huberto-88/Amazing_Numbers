@@ -1,7 +1,5 @@
 package numbers;
 
-import java.util.Objects;
-
 public class Validator {
 
     public static void isNumberCorrect(long first, long second) throws WrongRequestException {
@@ -17,7 +15,7 @@ public class Validator {
         if (!validate(request)) {
             String message = String.format("The property [%s] is wrong.\n" +
                     "Available properties: " + "[BUZZ, DUCK, PALINDROMIC, GAPFUL, " +
-                    "SPY, EVEN, ODD, SUNNY, SQUARE]", request);
+                    "SPY, EVEN, ODD, SUNNY, SQUARE, JUMPING]", request);
             throw new WrongRequestException(message);
         }
     }
@@ -26,7 +24,7 @@ public class Validator {
         if (!validate(firstRequest) && !validate(secondRequest)) {
             String message = String.format("The properties [%s, %s] are wrong.\n" +
                     "Available properties: " + "[BUZZ, DUCK, PALINDROMIC, GAPFUL, " +
-                    "SPY, EVEN, ODD, SUNNY, SQUARE]", firstRequest, secondRequest);
+                    "SPY, EVEN, ODD, SUNNY, SQUARE, JUMPING]", firstRequest, secondRequest);
             throw new WrongRequestException(message);
         }
     }
@@ -43,6 +41,6 @@ public class Validator {
     }
 
     private static boolean validate(String request) {
-        return "buzz, duck, palindromic, gapful, spy, even, odd, sunny, square".contains(request);
+        return "buzz, duck, palindromic, gapful, spy, even, odd, sunny, square, jumping".contains(request);
     }
 }

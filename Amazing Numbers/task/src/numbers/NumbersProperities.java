@@ -2,10 +2,8 @@ package numbers;
 
 import java.util.List;
 import java.util.function.LongPredicate;
-import java.util.function.Predicate;
 
 public class NumbersProperities {
-
     /**
      * Check if number is odd, ever or Buzz Number
      * If number ends with 7 or is divisible by 7 it is Buzz Number
@@ -23,11 +21,12 @@ public class NumbersProperities {
         System.out.println("         spy: " + checkIsSpy.test(number));
         System.out.println("       sunny: " + checkIsSunny.test(number));
         System.out.println("      square: " + checkIsSquare.test(number));
+        System.out.println("     jumping: " + checkIsJumping.test(number));
     }
 
-    public static void displayInfoAboutListOfNumbers(List<Long> listOfNumbers) {
-        for (long number : listOfNumbers) {
-            System.out.printf("%d is %s%s%s%s%s%s%s%s\n", number,
+    public static void displayInfoAboutListOfNumbers(long number, int howMany) {
+        for (int i = 0; i < howMany; i++) {
+            System.out.printf("%d is %s%s%s%s%s%s%s%s%s\n", number,
                     checkIsEven.test(number) ? "even, " : "odd, ",
                     checkIsBuzz.test(number) ? "buzz, " : "",
                     checkIsDuck.test(number) ? "duck, " : "",
@@ -35,8 +34,10 @@ public class NumbersProperities {
                     checkIsGapful.test(number) ? "gapful " : "",
                     checkIsSpy.test(number) ? "spy, " : "",
                     checkIsSunny.test(number) ? "sunny, " : "",
-                    checkIsSquare.test(number) ? "square, " : ""
+                    checkIsSquare.test(number) ? "square, " : "",
+                    checkIsJumping.test(number) ? "jumping, " : ""
             );
+            number++;
         }
     }
 
@@ -104,23 +105,38 @@ public class NumbersProperities {
         return checkIsSquare.test(number + 1);
     };
 
+    // jumping
+    public static LongPredicate checkIsJumping = number -> {
+        if (number < 10) {
+            return true;
+        }
+
+        String[] nString = String.valueOf(number).split("");
+        for (int i = 1; i < nString.length; i++) {
+            if (Math.abs((Integer.parseInt(nString[i - 1]) - (Integer.parseInt(nString[i])))) != 1) {
+                return false;
+            }
+        }
+        return true;
+    };
+
 //    ------------------------------------------------------------------------------------------------------------
 
-    public static void displayByRequest(LongPredicate check, long number, int howMuch) {
-        while (howMuch > 0) {
+    public static void displayByRequest(LongPredicate check, long number, int howMany) {
+        while (howMany > 0) {
             if (check.test(number)) {
-                displayInfoAboutListOfNumbers(List.of(number));
-                howMuch--;
+                displayInfoAboutListOfNumbers(number, 1);
+                howMany--;
             }
             number++;
         }
     }
 
-    public static void displayByRequest(LongPredicate check1, LongPredicate check2, long number, int howMuch) {
-        while (howMuch > 0) {
+    public static void displayByRequest(LongPredicate check1, LongPredicate check2, long number, int howMany) {
+        while (howMany > 0) {
             if (check1.test(number) && check2.test(number)) {
-                displayInfoAboutListOfNumbers(List.of(number));
-                howMuch--;
+                displayInfoAboutListOfNumbers(number, 1);
+                howMany--;
             }
             number++;
         }

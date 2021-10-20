@@ -911,6 +911,350 @@ files:
         }
     }
   learner_created: false
+- name: src/numbers/NotNaturalNumberException.java
+  visible: true
+  text: |
+    package numbers;
+
+    public class NotNaturalNumberException extends Exception {
+        public NotNaturalNumberException (String error) {
+            super(error);
+        }
+    }
+  learner_created: true
+- name: src/numbers/Validator.java
+  visible: true
+  text: |
+    package numbers;
+
+    import java.util.Objects;
+
+    public class Validator {
+
+        public static void isNumberCorrect(long first, long second) throws WrongRequestException {
+            if (first < 0) {
+                throw new WrongRequestException("The first parameter should be a natural number or zero.");
+            }
+            if (second < 0) {
+                throw new WrongRequestException("The second parameter should be a natural number or zero.");
+            }
+        }
+
+        public static void validateRequest(String request) throws WrongRequestException {
+            if (!validate(request)) {
+                String message = String.format("The property [%s] is wrong.\n" +
+                        "Available properties: " + "[BUZZ, DUCK, PALINDROMIC, GAPFUL, " +
+                        "SPY, EVEN, ODD, SUNNY, SQUARE]", request);
+                throw new WrongRequestException(message);
+            }
+        }
+
+        public static void validateTwoRequests(String firstRequest, String secondRequest) throws WrongRequestException {
+            if (!validate(firstRequest) && !validate(secondRequest)) {
+                String message = String.format("The properties [%s, %s] are wrong.\n" +
+                        "Available properties: " + "[BUZZ, DUCK, PALINDROMIC, GAPFUL, " +
+                        "SPY, EVEN, ODD, SUNNY, SQUARE]", firstRequest, secondRequest);
+                throw new WrongRequestException(message);
+            }
+        }
+
+        public static void validateMutuallyRequests(String firstRequest, String secondRequest) throws WrongRequestException {
+            if (("even odd".contains(firstRequest) && "even odd".contains(secondRequest))
+                    || ("duck spy".contains(firstRequest) && "duck spy".contains(secondRequest))
+                    || ("sunny square".contains(firstRequest) && "sunny square".contains(secondRequest))
+            ) {
+                String message = String.format("The request contains mutually exclusive properties: [%s, %s]\n" +
+                        "There are no numbers with these properties.", firstRequest, secondRequest);
+                throw new WrongRequestException(message);
+            }
+        }
+
+        private static boolean validate(String request) {
+            return "buzz, duck, palindromic, gapful, spy, even, odd, sunny, square".contains(request);
+        }
+    }
+  learner_created: true
+- name: src/numbers/WrongRequestException.java
+  visible: true
+  text: |
+    package numbers;
+
+    public class WrongRequestException extends Exception {
+        public WrongRequestException(String message) {
+            super(message);
+        }
+    }
+  learner_created: true
+- name: src/numbers/Application.java
+  visible: true
+  text: |-
+    package numbers;
+
+    import java.util.*;
+    import java.util.function.LongPredicate;
+
+    public class Application {
+        private final Scanner scanner = new Scanner(System.in);
+
+        public void runApplication() {
+            System.out.println("Welcome to Amazing Numbers!");
+            displayMenu();
+        }
+
+        /**
+         * Ask user for number to check
+         * If user's input isn't natural number than return false
+         * If user put natural number, return true
+         */
+        private void displayMenu() {
+            System.out.println("Supported requests:\n" +
+                    "- enter a natural number to know its properties; \n" +
+                    "- enter two natural numbers to obtain the properties of the list:\n" +
+                    "  * the first parameter represents a starting number;\n" +
+                    "  * the second parameter shows how many consecutive numbers are to be printed;\n" +
+                    "- two natural numbers and a property to search for;\n" +
+                    "- two natural numbers and two properties to search for;\n" +
+                    "- separate the parameters with one space;\n" +
+                    "- enter 0 to exit.");
+
+
+            while (true) {
+                System.out.println("Enter a request:");
+                try {
+                    String[] input = scanner.nextLine().split("\\s+");
+                    long number = Long.parseLong(input[0]);
+                    int consecutive = 1;
+                    List<Long> listOfNumbers = new ArrayList<>();
+                    String firstRequest = null;
+                    String secondRequest = null;
+
+                    if (input.length > 1) {
+                        consecutive = Integer.parseInt(input[1]);
+                    }
+
+                    Validator.isNumberCorrect(number, consecutive);
+
+                    if (number == 0) {
+                        System.out.println("Goodbye!");
+                        break;
+                    }
+
+                    if (input.length == 3) {
+                        firstRequest = input[2].toLowerCase();
+                        Validator.validateRequest(firstRequest);
+                    }
+                    if (input.length == 4) {
+                        firstRequest = input[2].toLowerCase();
+                        secondRequest = input[3].toLowerCase();
+                        Validator.validateTwoRequests(firstRequest, secondRequest);
+                        Validator.validateRequest(firstRequest);
+                        Validator.validateRequest(secondRequest);
+                        Validator.validateMutuallyRequests(firstRequest, secondRequest);
+                    }
+
+
+
+                    for (int i = 0; i < consecutive; i++) {
+                        listOfNumbers.add(number);
+                        number++;
+                    }
+                    displayInfoNumbers(listOfNumbers, consecutive, firstRequest, secondRequest);
+
+
+                } catch (InputMismatchException | WrongRequestException e) {
+                    System.out.println(e.getMessage());
+                }
+                System.out.println();
+            }
+        }
+
+        private void displayInfoNumbers(List<Long> listOfNumbers, int howMuch, String firstRequest, String secondRequest) {
+            long number = listOfNumbers.get(0);
+
+            if (Objects.nonNull(secondRequest)) {
+                NumbersProperities.displayByRequest(getPredicate(firstRequest), getPredicate(secondRequest), number, howMuch);
+            } else if (Objects.nonNull(firstRequest)) {
+                NumbersProperities.displayByRequest(getPredicate(firstRequest), number, howMuch);
+            } else if (howMuch > 1){
+                NumbersProperities.displayInfoAboutListOfNumbers(listOfNumbers);
+            } else if (howMuch == 1) {
+                NumbersProperities.displayInfoAboutOneNumber(listOfNumbers.get(0));
+            }
+        }
+
+        private LongPredicate getPredicate(String request) {
+            switch (request) {
+                case "even":
+                    return NumbersProperities.checkIsEven;
+                case "odd":
+                    return NumbersProperities.checkIsOdd;
+                case "buzz":
+                    return NumbersProperities.checkIsBuzz;
+                case "duck":
+                    return NumbersProperities.checkIsDuck;
+                case "palindromic":
+                    return NumbersProperities.checkIsPalindromic;
+                case "gapful":
+                    return NumbersProperities.checkIsGapful;
+                case "spy":
+                    return NumbersProperities.checkIsSpy;
+                case "square":
+                    return NumbersProperities.checkIsSquare;
+                case "sunny":
+                    return NumbersProperities.checkIsSunny;
+            }
+            return null;
+        }
+
+    }
+  learner_created: true
+- name: src/numbers/NumbersProperities.java
+  visible: true
+  text: |
+    package numbers;
+
+    import java.util.List;
+    import java.util.function.LongPredicate;
+    import java.util.function.Predicate;
+
+    public class NumbersProperities {
+
+        /**
+         * Check if number is odd, ever or Buzz Number
+         * If number ends with 7 or is divisible by 7 it is Buzz Number
+         */
+        public static void displayInfoAboutOneNumber(long number) {
+            String nString = String.valueOf(number);
+
+            System.out.println("Properties of " + nString);
+            System.out.println("        even: " + checkIsEven.test(number));
+            System.out.println("         odd: " + checkIsOdd.test(number));
+            System.out.println("        buzz: " + checkIsBuzz.test(number));
+            System.out.println("        duck: " + checkIsDuck.test(number));
+            System.out.println(" palindromic: " + checkIsPalindromic.test(number));
+            System.out.println("      gapful: " + checkIsGapful.test(number));
+            System.out.println("         spy: " + checkIsSpy.test(number));
+            System.out.println("       sunny: " + checkIsSunny.test(number));
+            System.out.println("      square: " + checkIsSquare.test(number));
+        }
+
+        public static void displayInfoAboutListOfNumbers(List<Long> listOfNumbers) {
+            for (long number : listOfNumbers) {
+                System.out.printf("%d is %s%s%s%s%s%s%s%s\n", number,
+                        checkIsEven.test(number) ? "even, " : "odd, ",
+                        checkIsBuzz.test(number) ? "buzz, " : "",
+                        checkIsDuck.test(number) ? "duck, " : "",
+                        checkIsPalindromic.test(number) ? "palindromic, " : "",
+                        checkIsGapful.test(number) ? "gapful " : "",
+                        checkIsSpy.test(number) ? "spy, " : "",
+                        checkIsSunny.test(number) ? "sunny, " : "",
+                        checkIsSquare.test(number) ? "square, " : ""
+                );
+            }
+        }
+
+    //    ----------------------------------------------------------------------------------------
+
+        // even
+        public static LongPredicate checkIsEven = number -> number % 2 == 0;
+
+        // odd
+        public static LongPredicate checkIsOdd = number -> !(number % 2 == 0);
+
+        // palindromic
+        public static LongPredicate checkIsPalindromic = number -> {
+            String nString = String.valueOf(number);
+            return nString.equals(new StringBuilder(nString).reverse().toString());
+        };
+
+        // duck
+        public static LongPredicate checkIsDuck = number -> {
+            String nString = String.valueOf(number);
+            return nString.contains("0");
+
+        };
+
+        // buzz
+        public static LongPredicate checkIsBuzz = number -> {
+            String nString = String.valueOf(number);
+            return number % 7 == 0 || nString.charAt(nString.length() - 1) == '7';
+        };
+
+        // gapful
+        public static LongPredicate checkIsGapful = number -> {
+            String nString = String.valueOf(number);
+            if (nString.length() < 3) {
+                return false;
+            } else {
+                int firstLast = Integer.parseInt(nString.charAt(0)
+                        + String.valueOf(nString.charAt(nString.length() - 1))
+                );
+                return number % firstLast == 0;
+            }
+        };
+
+        // spy
+        public static LongPredicate checkIsSpy = number -> {
+            String nString = String.valueOf(number);
+            int sum = 0;
+            int product = 1;
+            for (int i = 0; i < nString.length(); i++) {
+                int temp = Integer.parseInt(String.valueOf(nString.charAt(i)));
+                sum += temp;
+                product *= temp;
+            }
+            return sum == product;
+        };
+
+        // square
+        public static LongPredicate checkIsSquare = number -> {
+            long temp = (long) Math.sqrt(number);
+            return number == temp * temp;
+        };
+
+        // sunny
+        public static LongPredicate checkIsSunny = number -> {
+            return checkIsSquare.test(number + 1);
+        };
+
+    //    ------------------------------------------------------------------------------------------------------------
+
+        public static void displayByRequest(LongPredicate check, long number, int howMuch) {
+            while (howMuch > 0) {
+                if (check.test(number)) {
+                    displayInfoAboutListOfNumbers(List.of(number));
+                    howMuch--;
+                }
+                number++;
+            }
+        }
+
+        public static void displayByRequest(LongPredicate check1, LongPredicate check2, long number, int howMuch) {
+            while (howMuch > 0) {
+                if (check1.test(number) && check2.test(number)) {
+                    displayInfoAboutListOfNumbers(List.of(number));
+                    howMuch--;
+                }
+                number++;
+            }
+        }
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/184/stages/937/implement#comment
-status: Unchecked
+status: Failed
+feedback:
+  message: "Wrong answer in test #55\n\nExpected number is 3 but actual number is\
+    \ 2.\n\nPlease find below the output of your program during this failed test.\n\
+    Note that the &#39;&gt;&#39; character indicates the beginning of the input line.\n\
+    \n---\n\nWelcome to Amazing Numbers!\nSupported requests:\n- enter a natural number\
+    \ to know its properties;\n- enter two natural numbers to obtain the properties\
+    \ of the list:\n  * the first parameter represents a starting number;\n  * the\
+    \ second parameter shows how many consecutive numbers are to be printed;\n- two\
+    \ natural numbers and properties to search for;\n- separate the parameters with\
+    \ one space;\n- enter 0 to exit.\nEnter a request:\n&gt; 1 7 odd spy palindromic\n\
+    1 is odd, palindromic, spy, square, jumping, \n2 is even, palindromic, spy, jumping,\
+    \ \n3 is odd, palindromic, spy, sunny, jumping, \n4 is even, palindromic, spy,\
+    \ square, jumping, \n5 is odd, palindromic, spy, jumping, \n6 is even, palindromic,\
+    \ spy, jumping, \n7 is odd, buzz, palindromic, spy, jumping, \n\nEnter a request:"
+  time: Wed, 20 Oct 2021 23:44:03 UTC
 record: -1
