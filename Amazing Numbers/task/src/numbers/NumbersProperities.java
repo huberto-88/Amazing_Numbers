@@ -122,19 +122,16 @@ public class NumbersProperities {
 
 //    ------------------------------------------------------------------------------------------------------------
 
-    public static void displayByRequest(LongPredicate check, long number, int howMany) {
+    public static void displayByRequest(List<LongPredicate> check, long number, int howMany) {
         while (howMany > 0) {
-            if (check.test(number)) {
-                displayInfoAboutListOfNumbers(number, 1);
-                howMany--;
+            boolean numberIsOk = true;
+            for (int i = 0; i < check.size(); i++) {
+                if (!check.get(i).test(number)) {
+                    numberIsOk = false;
+                    break;
+                }
             }
-            number++;
-        }
-    }
-
-    public static void displayByRequest(LongPredicate check1, LongPredicate check2, long number, int howMany) {
-        while (howMany > 0) {
-            if (check1.test(number) && check2.test(number)) {
+            if (numberIsOk) {
                 displayInfoAboutListOfNumbers(number, 1);
                 howMany--;
             }

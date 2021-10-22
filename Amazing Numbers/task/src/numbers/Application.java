@@ -7,24 +7,7 @@ public class Application {
     private final Scanner scanner = new Scanner(System.in);
 
     public void runApplication() {
-        System.out.println("Welcome to Amazing Numbers!");
-        displayMenu();
-    }
-
-    /**
-     * Ask user for number to check
-     * If user's input isn't natural number than return false
-     * If user put natural number, return true
-     */
-    private void displayMenu() {
-        System.out.println("Supported requests:\n" +
-                "- enter a natural number to know its properties;\n" +
-                "- enter two natural numbers to obtain the properties of the list:\n" +
-                "  * the first parameter represents a starting number;\n" +
-                "  * the second parameter shows how many consecutive numbers are to be printed;\n" +
-                "- two natural numbers and properties to search for;\n" +
-                "- separate the parameters with one space;\n" +
-                "- enter 0 to exit.");
+        displayInfo();
 
         while (true) {
             System.out.println("Enter a request:");
@@ -32,8 +15,7 @@ public class Application {
                 String[] input = scanner.nextLine().split("\\s+");
                 int howMany = 0;
                 long number = Long.parseLong(input[0]);
-                String firstRequest = null;
-                String secondRequest = null;
+                List<String> requests = new ArrayList<>();
 
                 if (input.length > 1) {
                     howMany = Integer.parseInt(input[1]);
@@ -46,20 +28,16 @@ public class Application {
                     break;
                 }
 
-                if (input.length == 3) {
-                    firstRequest = input[2].toLowerCase();
-                    Validator.validateRequest(firstRequest);
-                }
-                if (input.length == 4) {
-                    firstRequest = input[2].toLowerCase();
-                    secondRequest = input[3].toLowerCase();
-                    Validator.validateTwoRequests(firstRequest, secondRequest);
-                    Validator.validateRequest(firstRequest);
-                    Validator.validateRequest(secondRequest);
-                    Validator.validateMutuallyRequests(firstRequest, secondRequest);
+                if (input.length > 2) {
+                    for (int i = 2; i < input.length; i++) {
+                        requests.add(input[i].toLowerCase());
+                    }
+
+                    Validator.validateRequest(requests);
+                    Validator.validateMutuallyRequest(requests);
                 }
 
-                displayInfoNumbers(number, howMany, firstRequest, secondRequest);
+                displayInfoNumbers(number, howMany, requests);
 
             } catch (InputMismatchException | WrongRequestException e) {
                 System.out.println(e.getMessage());
@@ -68,11 +46,11 @@ public class Application {
         }
     }
 
-    private void displayInfoNumbers(long number, int howMany, String firstRequest, String secondRequest) {
-        if (Objects.nonNull(secondRequest)) {
-            NumbersProperities.displayByRequest(getPredicate(firstRequest), getPredicate(secondRequest), number, howMany);
-        } else if (Objects.nonNull(firstRequest)) {
-            NumbersProperities.displayByRequest(getPredicate(firstRequest), number, howMany);
+    private void displayInfoNumbers(long number, int howMany, List<String> requests) {
+        if (!requests.isEmpty()) {
+            List<LongPredicate> predicates = new ArrayList<>();
+            requests.forEach(request -> predicates.add(getPredicate(request)));
+            NumbersProperities.displayByRequest(predicates, number, howMany);
         } else if (howMany > 0){
             NumbersProperities.displayInfoAboutListOfNumbers(number, howMany);
         } else if (howMany == 0) {
@@ -104,6 +82,19 @@ public class Application {
                 return NumbersProperities.checkIsJumping;
         }
         return null;
+    }
+
+    public void displayInfo() {
+        System.out.println("Welcome to Amazing Numbers!");
+
+        System.out.println("Supported requests:\n" +
+                "- enter a natural number to know its properties;\n" +
+                "- enter two natural numbers to obtain the properties of the list:\n" +
+                "  * the first parameter represents a starting number;\n" +
+                "  * the second parameter shows how many consecutive numbers are to be printed;\n" +
+                "- two natural numbers and properties to search for;\n" +
+                "- separate the parameters with one space;\n" +
+                "- enter 0 to exit.");
     }
 
 }

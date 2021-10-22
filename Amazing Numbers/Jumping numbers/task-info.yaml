@@ -1241,20 +1241,8 @@ files:
     }
   learner_created: true
 feedback_link: https://hyperskill.org/projects/184/stages/937/implement#comment
-status: Failed
+status: Solved
 feedback:
-  message: "Wrong answer in test #55\n\nExpected number is 3 but actual number is\
-    \ 2.\n\nPlease find below the output of your program during this failed test.\n\
-    Note that the &#39;&gt;&#39; character indicates the beginning of the input line.\n\
-    \n---\n\nWelcome to Amazing Numbers!\nSupported requests:\n- enter a natural number\
-    \ to know its properties;\n- enter two natural numbers to obtain the properties\
-    \ of the list:\n  * the first parameter represents a starting number;\n  * the\
-    \ second parameter shows how many consecutive numbers are to be printed;\n- two\
-    \ natural numbers and properties to search for;\n- separate the parameters with\
-    \ one space;\n- enter 0 to exit.\nEnter a request:\n&gt; 1 7 odd spy palindromic\n\
-    1 is odd, palindromic, spy, square, jumping, \n2 is even, palindromic, spy, jumping,\
-    \ \n3 is odd, palindromic, spy, sunny, jumping, \n4 is even, palindromic, spy,\
-    \ square, jumping, \n5 is odd, palindromic, spy, jumping, \n6 is even, palindromic,\
-    \ spy, jumping, \n7 is odd, buzz, palindromic, spy, jumping, \n\nEnter a request:"
-  time: Wed, 20 Oct 2021 23:44:03 UTC
-record: -1
+  message: Congratulations!
+  time: Fri, 22 Oct 2021 01:34:04 UTC
+record: 7
