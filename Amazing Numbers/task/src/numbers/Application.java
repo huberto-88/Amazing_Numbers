@@ -15,7 +15,9 @@ public class Application {
                 String[] input = scanner.nextLine().split("\\s+");
                 int howMany = 0;
                 long number = Long.parseLong(input[0]);
-                List<String> requests = new ArrayList<>();
+                List<String> allRequests = new ArrayList<>();
+                List<String> requestsWanted = new ArrayList<>();
+                List<String> requestsUnwanted = new ArrayList<>();
 
                 if (input.length > 1) {
                     howMany = Integer.parseInt(input[1]);
@@ -30,14 +32,19 @@ public class Application {
 
                 if (input.length > 2) {
                     for (int i = 2; i < input.length; i++) {
-                        requests.add(input[i].toLowerCase());
+                        if (input[i].contains("-")) {
+                            requestsUnwanted.add(input[i].replaceFirst("-", "").toLowerCase());
+                        } else {
+                            requestsWanted.add(input[i].toLowerCase());
+                        }
                     }
 
-                    Validator.validateRequest(requests);
-                    Validator.validateMutuallyRequest(requests);
+                    Validator.validateRequest(requestsWanted);
+                    Validator.validateRequest(requestsUnwanted);
+                    Validator.validateMutuallyRequest(requestsWanted, requestsUnwanted);
                 }
 
-                displayInfoNumbers(number, howMany, requests);
+                displayInfoNumbers(number, howMany, requestsWanted, requestsUnwanted);
 
             } catch (InputMismatchException | WrongRequestException e) {
                 System.out.println(e.getMessage());
@@ -46,11 +53,13 @@ public class Application {
         }
     }
 
-    private void displayInfoNumbers(long number, int howMany, List<String> requests) {
-        if (!requests.isEmpty()) {
-            List<LongPredicate> predicates = new ArrayList<>();
-            requests.forEach(request -> predicates.add(getPredicate(request)));
-            NumbersProperities.displayByRequest(predicates, number, howMany);
+    private void displayInfoNumbers(long number, int howMany, List<String> requestsWanted, List<String> requestsUnwanted) {
+        if (!requestsWanted.isEmpty() || !requestsUnwanted.isEmpty()) {
+            List<LongPredicate> predicatesWanted = new ArrayList<>();
+            List<LongPredicate> predicatesUnwanted = new ArrayList<>();
+            requestsWanted.forEach(request -> predicatesWanted.add(getPredicate(request)));
+            requestsUnwanted.forEach(request -> predicatesUnwanted.add(getPredicate(request)));
+            NumbersProperities.displayByRequest(number, howMany, predicatesWanted, predicatesUnwanted);
         } else if (howMany > 0){
             NumbersProperities.displayInfoAboutListOfNumbers(number, howMany);
         } else if (howMany == 0) {
@@ -80,6 +89,10 @@ public class Application {
                 return NumbersProperities.checkIsSunny;
             case "jumping":
                 return NumbersProperities.checkIsJumping;
+            case "happy":
+                return NumbersProperities.checkIsHappy;
+            case "sad":
+                return NumbersProperities.checkIsSad;
         }
         return null;
     }
@@ -91,8 +104,9 @@ public class Application {
                 "- enter a natural number to know its properties;\n" +
                 "- enter two natural numbers to obtain the properties of the list:\n" +
                 "  * the first parameter represents a starting number;\n" +
-                "  * the second parameter shows how many consecutive numbers are to be printed;\n" +
+                "  * the second parameter shows how many consecutive numbers are to be processed;\n" +
                 "- two natural numbers and properties to search for;\n" +
+                "- a property preceded by minus must not be present in numbers;\n" +
                 "- separate the parameters with one space;\n" +
                 "- enter 0 to exit.");
     }

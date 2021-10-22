@@ -1,5 +1,6 @@
 package numbers;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.LongPredicate;
 
@@ -22,11 +23,13 @@ public class NumbersProperities {
         System.out.println("       sunny: " + checkIsSunny.test(number));
         System.out.println("      square: " + checkIsSquare.test(number));
         System.out.println("     jumping: " + checkIsJumping.test(number));
+        System.out.println("       happy: " + checkIsHappy.test(number));
+        System.out.println("         sad: " + checkIsSad.test(number));
     }
 
     public static void displayInfoAboutListOfNumbers(long number, int howMany) {
         for (int i = 0; i < howMany; i++) {
-            System.out.printf("%d is %s%s%s%s%s%s%s%s%s\n", number,
+            System.out.printf("%d is %s%s%s%s%s%s%s%s%s%s\n", number,
                     checkIsEven.test(number) ? "even, " : "odd, ",
                     checkIsBuzz.test(number) ? "buzz, " : "",
                     checkIsDuck.test(number) ? "duck, " : "",
@@ -35,7 +38,8 @@ public class NumbersProperities {
                     checkIsSpy.test(number) ? "spy, " : "",
                     checkIsSunny.test(number) ? "sunny, " : "",
                     checkIsSquare.test(number) ? "square, " : "",
-                    checkIsJumping.test(number) ? "jumping, " : ""
+                    checkIsJumping.test(number) ? "jumping, " : "",
+                    checkIsSad.test(number) ? "happy, " : "unhappy, "
             );
             number++;
         }
@@ -101,9 +105,7 @@ public class NumbersProperities {
     };
 
     // sunny
-    public static LongPredicate checkIsSunny = number -> {
-        return checkIsSquare.test(number + 1);
-    };
+    public static LongPredicate checkIsSunny = number -> checkIsSquare.test(number + 1);
 
     // jumping
     public static LongPredicate checkIsJumping = number -> {
@@ -120,18 +122,45 @@ public class NumbersProperities {
         return true;
     };
 
+    // happy
+    public static LongPredicate checkIsHappy = number -> isHappyAuxiliary(number) == 1;
+
+    // unhappy
+    public static LongPredicate checkIsSad = number -> isHappyAuxiliary(number) != 1;
+
+    private static int isHappyAuxiliary(long number) {
+        if (number == 1) {
+            return 1;
+        } else if (number == 4) {
+            return -1;
+        } else {
+            long result = Arrays.stream(String.valueOf(number).split(""))
+                    .mapToLong(Long::parseLong)
+                    .map(n -> n * n)
+                    .sum();
+            return isHappyAuxiliary(result);
+        }
+    }
+
 //    ------------------------------------------------------------------------------------------------------------
 
-    public static void displayByRequest(List<LongPredicate> check, long number, int howMany) {
+    public static void displayByRequest(long number, int howMany, List<LongPredicate> wanted, List<LongPredicate> unwanted) {
         while (howMany > 0) {
-            boolean numberIsOk = true;
-            for (int i = 0; i < check.size(); i++) {
-                if (!check.get(i).test(number)) {
-                    numberIsOk = false;
-                    break;
+            boolean numberIsOK = true;
+            for (LongPredicate want : wanted) {
+                if (!want.test(number)) {
+                    numberIsOK = false;
+                }
+
+            }
+
+            for (LongPredicate unwant : unwanted) {
+                if (unwant.test(number)) {
+                    numberIsOK = false;
                 }
             }
-            if (numberIsOk) {
+
+            if (numberIsOK) {
                 displayInfoAboutListOfNumbers(number, 1);
                 howMany--;
             }

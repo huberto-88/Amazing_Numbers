@@ -19,7 +19,7 @@ public class Validator {
         List<String> wrongRequests = new ArrayList<>();
 
         for (String request : requests) {
-            if (!"buzz, duck, palindromic, gapful, spy, even, odd, sunny, square, jumping".contains(request)) {
+            if (!"buzz, duck, palindromic, gapful, spy, even, odd, sunny, square, jumping, happy, sad".contains(request)) {
                 wrongRequests.add(request);
             }
         }
@@ -28,22 +28,48 @@ public class Validator {
                     "ies " + wrongRequests + " are" : "y " + wrongRequests + " is";
             String message = String.format("The propert%s wrong.\n" +
                     "Available properties: " + "[BUZZ, DUCK, PALINDROMIC, GAPFUL, " +
-                    "SPY, EVEN, ODD, SUNNY, SQUARE, JUMPING]", errors);
+                    "SPY, EVEN, ODD, SUNNY, SQUARE, JUMPING, HAPPY, SAD]", errors);
             throw new WrongRequestException(message);
         }
     }
 
-    public static void validateMutuallyRequest(List<String> requests) throws WrongRequestException {
+    public static void validateMutuallyRequest(List<String> wanted, List<String> unwanted) throws WrongRequestException {
         String mutualPair = null;
-        if (requests.contains("even") && requests.contains("odd")) {
+
+        for (String request : wanted) {
+            if (unwanted.contains(request)) {
+                mutualPair = request + ", -" + request;
+            }
+        }
+
+        if (wanted.contains("even") && wanted.contains("odd")) {
             mutualPair = "even, odd";
         }
-        if (requests.contains("duck") && requests.contains("spy")) {
+
+        if (wanted.contains("duck") && wanted.contains("spy")) {
             mutualPair = "duck, spy";
         }
-        if (requests.contains("sunny") && requests.contains("square")) {
+        if (wanted.contains("sunny") && wanted.contains("square")) {
             mutualPair = "sunny, square";
         }
+        if (wanted.contains("happy") && wanted.contains("sad")) {
+            mutualPair = "happy, sad";
+        }
+
+        if (unwanted.contains("even") && unwanted.contains("odd")) {
+            mutualPair = "-even, -odd";
+        }
+
+        if (unwanted.contains("duck") && unwanted.contains("spy")) {
+            mutualPair = "-duck, -spy";
+        }
+        if (unwanted.contains("sunny") && unwanted.contains("square")) {
+            mutualPair = "-sunny, -square";
+        }
+        if (unwanted.contains("happy") && unwanted.contains("sad")) {
+            mutualPair = "-happy, -sad";
+        }
+
         if (Objects.nonNull(mutualPair)) {
             String message = String.format("The request contains mutually exclusive properties: [%s]\n" +
                     "There are no numbers with these properties.", mutualPair);
