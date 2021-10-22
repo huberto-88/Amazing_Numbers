@@ -4,11 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.LongPredicate;
 
-public class NumbersProperities {
-    /**
-     * Check if number is odd, ever or Buzz Number
-     * If number ends with 7 or is divisible by 7 it is Buzz Number
-     */
+public class NumbersProperties {
     public static void displayInfoAboutOneNumber(long number) {
         String nString = String.valueOf(number);
 
@@ -29,7 +25,7 @@ public class NumbersProperities {
 
     public static void displayInfoAboutListOfNumbers(long number, int howMany) {
         for (int i = 0; i < howMany; i++) {
-            System.out.printf("%d is %s%s%s%s%s%s%s%s%s%s\n", number,
+            String answer = String.format("%d is %s%s%s%s%s%s%s%s%s%s", number,
                     checkIsEven.test(number) ? "even, " : "odd, ",
                     checkIsBuzz.test(number) ? "buzz, " : "",
                     checkIsDuck.test(number) ? "duck, " : "",
@@ -41,6 +37,7 @@ public class NumbersProperities {
                     checkIsJumping.test(number) ? "jumping, " : "",
                     checkIsSad.test(number) ? "happy, " : "unhappy, "
             );
+            System.out.println(answer.replaceAll(", $", ""));
             number++;
         }
     }
@@ -63,7 +60,6 @@ public class NumbersProperities {
     public static LongPredicate checkIsDuck = number -> {
         String nString = String.valueOf(number);
         return nString.contains("0");
-
     };
 
     // buzz
@@ -146,21 +142,20 @@ public class NumbersProperities {
 
     public static void displayByRequest(long number, int howMany, List<LongPredicate> wanted, List<LongPredicate> unwanted) {
         while (howMany > 0) {
-            boolean numberIsOK = true;
+            boolean numberIsCorrect = true;
             for (LongPredicate want : wanted) {
                 if (!want.test(number)) {
-                    numberIsOK = false;
+                    numberIsCorrect = false;
                 }
-
             }
 
             for (LongPredicate unwant : unwanted) {
                 if (unwant.test(number)) {
-                    numberIsOK = false;
+                    numberIsCorrect = false;
                 }
             }
 
-            if (numberIsOK) {
+            if (numberIsCorrect) {
                 displayInfoAboutListOfNumbers(number, 1);
                 howMany--;
             }

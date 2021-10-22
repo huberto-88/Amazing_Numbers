@@ -15,7 +15,6 @@ public class Application {
                 String[] input = scanner.nextLine().split("\\s+");
                 int howMany = 0;
                 long number = Long.parseLong(input[0]);
-                List<String> allRequests = new ArrayList<>();
                 List<String> requestsWanted = new ArrayList<>();
                 List<String> requestsUnwanted = new ArrayList<>();
 
@@ -38,15 +37,11 @@ public class Application {
                             requestsWanted.add(input[i].toLowerCase());
                         }
                     }
-
-                    Validator.validateRequest(requestsWanted);
-                    Validator.validateRequest(requestsUnwanted);
-                    Validator.validateMutuallyRequest(requestsWanted, requestsUnwanted);
+                    Validator.validateRequests(requestsWanted, requestsUnwanted);
                 }
-
                 displayInfoNumbers(number, howMany, requestsWanted, requestsUnwanted);
 
-            } catch (InputMismatchException | WrongRequestException e) {
+            } catch (InputMismatchException | WrongRequestException | MutualRequestException | NotNaturalNumberException e) {
                 System.out.println(e.getMessage());
             }
             System.out.println();
@@ -59,40 +54,40 @@ public class Application {
             List<LongPredicate> predicatesUnwanted = new ArrayList<>();
             requestsWanted.forEach(request -> predicatesWanted.add(getPredicate(request)));
             requestsUnwanted.forEach(request -> predicatesUnwanted.add(getPredicate(request)));
-            NumbersProperities.displayByRequest(number, howMany, predicatesWanted, predicatesUnwanted);
+            NumbersProperties.displayByRequest(number, howMany, predicatesWanted, predicatesUnwanted);
         } else if (howMany > 0){
-            NumbersProperities.displayInfoAboutListOfNumbers(number, howMany);
+            NumbersProperties.displayInfoAboutListOfNumbers(number, howMany);
         } else if (howMany == 0) {
-            NumbersProperities.displayInfoAboutOneNumber(number);
+            NumbersProperties.displayInfoAboutOneNumber(number);
         }
     }
 
     private LongPredicate getPredicate(String request) {
         switch (request) {
             case "even":
-                return NumbersProperities.checkIsEven;
+                return NumbersProperties.checkIsEven;
             case "odd":
-                return NumbersProperities.checkIsOdd;
+                return NumbersProperties.checkIsOdd;
             case "buzz":
-                return NumbersProperities.checkIsBuzz;
+                return NumbersProperties.checkIsBuzz;
             case "duck":
-                return NumbersProperities.checkIsDuck;
+                return NumbersProperties.checkIsDuck;
             case "palindromic":
-                return NumbersProperities.checkIsPalindromic;
+                return NumbersProperties.checkIsPalindromic;
             case "gapful":
-                return NumbersProperities.checkIsGapful;
+                return NumbersProperties.checkIsGapful;
             case "spy":
-                return NumbersProperities.checkIsSpy;
+                return NumbersProperties.checkIsSpy;
             case "square":
-                return NumbersProperities.checkIsSquare;
+                return NumbersProperties.checkIsSquare;
             case "sunny":
-                return NumbersProperities.checkIsSunny;
+                return NumbersProperties.checkIsSunny;
             case "jumping":
-                return NumbersProperities.checkIsJumping;
+                return NumbersProperties.checkIsJumping;
             case "happy":
-                return NumbersProperities.checkIsHappy;
+                return NumbersProperties.checkIsHappy;
             case "sad":
-                return NumbersProperities.checkIsSad;
+                return NumbersProperties.checkIsSad;
         }
         return null;
     }
@@ -110,5 +105,4 @@ public class Application {
                 "- separate the parameters with one space;\n" +
                 "- enter 0 to exit.");
     }
-
 }

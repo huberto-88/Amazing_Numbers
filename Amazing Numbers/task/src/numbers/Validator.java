@@ -2,20 +2,25 @@ package numbers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Validator {
 
-    public static void isNumberCorrect(long first, long second) throws WrongRequestException {
+    public static void isNumberCorrect(long first, long second) throws NotNaturalNumberException {
         if (first < 0) {
-            throw new WrongRequestException("The first parameter should be a natural number or zero.");
+            throw new NotNaturalNumberException("The first parameter should be a natural number or zero.");
         }
         if (second < 0) {
-            throw new WrongRequestException("The second parameter should be a natural number or zero.");
+            throw new NotNaturalNumberException("The second parameter should be a natural number or zero.");
         }
     }
 
-    public static void validateRequest(List<String> requests) throws WrongRequestException {
+    public static void validateRequests(List<String> wanted, List<String> unwanted) throws WrongRequestException, MutualRequestException {
+        validate(wanted);
+        validate(unwanted);
+        validateMutuallyRequest(wanted, unwanted);
+    }
+
+    public static void validate(List<String> requests) throws WrongRequestException {
         List<String> wrongRequests = new ArrayList<>();
 
         for (String request : requests) {
@@ -33,47 +38,36 @@ public class Validator {
         }
     }
 
-    public static void validateMutuallyRequest(List<String> wanted, List<String> unwanted) throws WrongRequestException {
-        String mutualPair = null;
-
+    public static void validateMutuallyRequest(List<String> wanted, List<String> unwanted) throws MutualRequestException {
         for (String request : wanted) {
             if (unwanted.contains(request)) {
-                mutualPair = request + ", -" + request;
+                throw new MutualRequestException(request + ", " + request);
             }
         }
 
         if (wanted.contains("even") && wanted.contains("odd")) {
-            mutualPair = "even, odd";
+            throw new MutualRequestException("even, odd");
         }
-
         if (wanted.contains("duck") && wanted.contains("spy")) {
-            mutualPair = "duck, spy";
+            throw new MutualRequestException("duck, spy");
         }
         if (wanted.contains("sunny") && wanted.contains("square")) {
-            mutualPair = "sunny, square";
+            throw new MutualRequestException("sunny, square");
         }
         if (wanted.contains("happy") && wanted.contains("sad")) {
-            mutualPair = "happy, sad";
+            throw new MutualRequestException("happy, sad");
         }
-
         if (unwanted.contains("even") && unwanted.contains("odd")) {
-            mutualPair = "-even, -odd";
+            throw new MutualRequestException("-even, -odd");
         }
-
         if (unwanted.contains("duck") && unwanted.contains("spy")) {
-            mutualPair = "-duck, -spy";
+            throw new MutualRequestException("-duck, -spy");
         }
         if (unwanted.contains("sunny") && unwanted.contains("square")) {
-            mutualPair = "-sunny, -square";
+            throw new MutualRequestException("-sunny, -square");
         }
         if (unwanted.contains("happy") && unwanted.contains("sad")) {
-            mutualPair = "-happy, -sad";
-        }
-
-        if (Objects.nonNull(mutualPair)) {
-            String message = String.format("The request contains mutually exclusive properties: [%s]\n" +
-                    "There are no numbers with these properties.", mutualPair);
-            throw new WrongRequestException(message);
+            throw new MutualRequestException("-happy, -sad");
         }
     }
 }
